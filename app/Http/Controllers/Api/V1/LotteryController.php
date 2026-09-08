@@ -11,7 +11,6 @@ class LotteryController extends Controller
     public function index(): JsonResponse
     {
         $lotteries = Lottery::active()
-            ->withCount('ticketPurchases')
             ->orderBy('draw_date')
             ->get()
             ->map(fn($l) => $this->lotteryResource($l));
@@ -21,16 +20,12 @@ class LotteryController extends Controller
 
     public function show(Lottery $lottery): JsonResponse
     {
-        $lottery->loadCount([
-            'ticketPurchases',
-            'ticketPurchases as approved_count' => fn($q) => $q->where('status', 'approved'),
-        ]);
-
         return response()->json(['success' => true, 'data' => $this->lotteryResource($lottery)]);
     }
 
     private function lotteryResource(Lottery $lottery): array
     {
+        $sold = $lottery->soldTicketsCount();
         return [
             'id'            => $lottery->id,
             'name'          => $lottery->name,
@@ -39,9 +34,9 @@ class LotteryController extends Controller
             'draw_date'     => $lottery->draw_date?->toIso8601String(),
             'status'        => $lottery->status,
             'number_prefix' => $lottery->number_prefix,
-            'tickets_sold'  => $lottery->ticket_purchases_count ?? 0,
+            'tickets_sold'  => $sold,
             'max_tickets'   => $lottery->max_tickets,
-            'remaining'     => $lottery->remainingTickets(),
+            'remaining'     => $lottery->max_tickets ? max(0, $lottery->max_tickets - $sold) : null,
         ];
     }
 }

@@ -56,7 +56,9 @@ class Lottery extends Model
 
     public function soldTicketsCount(): int
     {
-        return $this->ticketPurchases()->whereIn('status', ['pending', 'approved'])->count();
+        return (int) $this->ticketPurchases()
+            ->where('status', 'approved')
+            ->sum('quantity');
     }
 
     public function remainingTickets(): ?int
@@ -71,7 +73,7 @@ class Lottery extends Model
     {
         return (float) $this->ticketPurchases()
             ->where('status', 'approved')
-            ->sum('ticket_price');
+            ->sum('total_price');
     }
 
     public function nextNumberSequence(): int
