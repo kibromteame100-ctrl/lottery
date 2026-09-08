@@ -15,6 +15,8 @@ class TicketPurchase extends Model
         'user_id',
         'lottery_id',
         'ticket_price',
+        'quantity',
+        'total_price',
         'payment_method',
         'transaction_id',
         'screenshot_path',
@@ -28,6 +30,8 @@ class TicketPurchase extends Model
     {
         return [
             'ticket_price'  => 'decimal:2',
+            'total_price'   => 'decimal:2',
+            'quantity'      => 'integer',
             'reviewed_at'   => 'datetime',
         ];
     }
