@@ -15,10 +15,15 @@ class LotteryNumberGenerator
      *
      * @throws \RuntimeException if a unique number cannot be generated after max attempts
      */
-    public function generate(TicketPurchase $purchase): LotteryNumber
+    public function generate(TicketPurchase $purchase, int $index = 0): LotteryNumber
     {
-        // If a number already exists, return it (idempotent)
-        if ($existing = $purchase->lotteryNumber) {
+        // If a number already exists for this index, return it (idempotent)
+        $existing = LotteryNumber::where('ticket_purchase_id', $purchase->id)
+            ->orderBy('id')
+            ->skip($index)
+            ->first();
+
+        if ($existing) {
             return $existing;
         }
 

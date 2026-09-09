@@ -33,8 +33,13 @@ class TicketApprovalService
                 throw new \RuntimeException(__('tickets.already_processed'));
             }
 
-            // Generate unique lottery number first — fail fast before updating status
-            $lotteryNumber = $this->numberGenerator->generate($purchase);
+            $quantity = $purchase->quantity ?? 1;
+
+            // Generate one unique lottery number per ticket quantity
+            $lotteryNumbers = [];
+            for ($i = 0; $i < $quantity; $i++) {
+                $lotteryNumbers[] = $this->numberGenerator->generate($purchase, $i);
+            }
 
             $purchase->update([
                 'status'      => 'approved',
@@ -42,17 +47,19 @@ class TicketApprovalService
                 'reviewed_at' => now(),
             ]);
 
+            $numbersList = collect($lotteryNumbers)->pluck('number')->implode(', ');
+
             // Notify the user
             UserNotification::create([
                 'user_id' => $purchase->user_id,
                 'type'    => 'ticket_approved',
                 'title'   => __('notifications.ticket_approved_title'),
-                'message' => __('notifications.ticket_approved_message', [
-                    'number' => $lotteryNumber->number,
-                ]),
+                'message' => $quantity > 1
+                    ? "Your {$quantity} tickets have been approved. Your lottery numbers: {$numbersList}"
+                    : __('notifications.ticket_approved_message', ['number' => $lotteryNumbers[0]->number]),
                 'data' => [
                     'ticket_purchase_id' => $purchase->id,
-                    'lottery_number'     => $lotteryNumber->number,
+                    'lottery_numbers'    => collect($lotteryNumbers)->pluck('number'),
                 ],
             ]);
 
@@ -63,14 +70,14 @@ class TicketApprovalService
                 entityId: $purchase->id,
                 oldValues: ['status' => 'pending'],
                 newValues: [
-                    'status'         => 'approved',
-                    'lottery_number' => $lotteryNumber->number,
-                    'reviewed_by'    => $adminId,
+                    'status'          => 'approved',
+                    'lottery_numbers' => collect($lotteryNumbers)->pluck('number'),
+                    'reviewed_by'     => $adminId,
                 ],
                 adminId: $adminId,
             );
 
-            return $purchase->fresh(['lotteryNumber', 'user', 'lottery']);
+            return $purchase->fresh(['lotteryNumbers', 'user', 'lottery']);
         });
     }
 

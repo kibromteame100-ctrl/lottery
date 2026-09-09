@@ -17,7 +17,7 @@ class TicketPurchaseController extends Controller
     {
         $purchases = $request->user()
             ->ticketPurchases()
-            ->with(['lottery:id,name,draw_date', 'lotteryNumber:id,ticket_purchase_id,number,generated_at'])
+            ->with(['lottery:id,name,draw_date', 'lotteryNumbers:id,ticket_purchase_id,number,generated_at'])
             ->latest()
             ->paginate(20);
 
@@ -38,7 +38,7 @@ class TicketPurchaseController extends Controller
             return response()->json(['success' => false, 'message' => __('auth.unauthorized')], 403);
         }
 
-        $ticketPurchase->load(['lottery', 'lotteryNumber']);
+        $ticketPurchase->load(['lottery', 'lotteryNumbers']);
 
         return response()->json([
             'success' => true,
@@ -141,6 +141,7 @@ class TicketPurchaseController extends Controller
             'status'           => $p->status,
             'rejection_reason' => $p->rejection_reason,
             'lottery_number'   => $p->lotteryNumber?->number,
+            'lottery_numbers'  => $p->lotteryNumbers?->pluck('number'),
             'reviewed_at'      => $p->reviewed_at?->toIso8601String(),
             'created_at'       => $p->created_at->toIso8601String(),
         ];

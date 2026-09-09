@@ -45,7 +45,7 @@ class TicketController extends Controller
 
     public function show(TicketPurchase $ticket)
     {
-        $ticket->load(['user', 'lottery', 'reviewer', 'lotteryNumber']);
+        $ticket->load(['user', 'lottery', 'reviewer', 'lotteryNumbers']);
         return view('admin.tickets.show', compact('ticket'));
     }
 

@@ -98,14 +98,16 @@
                     </div>
                     @endif
 
-                    @if($ticket->isApproved() && $ticket->lotteryNumber)
+                    @if($ticket->isApproved() && $ticket->lotteryNumbers->count() > 0)
                     <div class="sm:col-span-2">
-                        <dt class="text-gray-500 dark:text-gray-400">Lottery Number</dt>
-                        <dd class="mt-1">
+                        <dt class="text-gray-500 dark:text-gray-400">Lottery Numbers</dt>
+                        <dd class="mt-2 flex flex-wrap gap-2">
+                            @foreach($ticket->lotteryNumbers as $ln)
                             <span class="inline-block bg-green-100 dark:bg-green-900/40 text-green-800
-                                         dark:text-green-300 font-mono font-bold text-lg px-4 py-2 rounded-lg">
-                                {{ $ticket->lotteryNumber->number }}
+                                         dark:text-green-300 font-mono font-bold text-base px-4 py-2 rounded-lg">
+                                {{ $ln->number }}
                             </span>
+                            @endforeach
                         </dd>
                     </div>
                     @endif

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class TicketPurchase extends Model
@@ -55,6 +56,11 @@ class TicketPurchase extends Model
     public function lotteryNumber(): HasOne
     {
         return $this->hasOne(LotteryNumber::class);
+    }
+
+    public function lotteryNumbers(): HasMany
+    {
+        return $this->hasMany(LotteryNumber::class);
     }
 
     // Scopes
