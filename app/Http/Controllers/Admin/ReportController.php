@@ -16,19 +16,21 @@ class ReportController extends Controller
         $to   = $request->filled('to')   ? $request->to   : now()->toDateString();
 
         $summary = TicketPurchase::select(
-            DB::raw('COUNT(*) as total'),
-            DB::raw('SUM(CASE WHEN status = "approved" THEN 1 ELSE 0 END) as approved'),
-            DB::raw('SUM(CASE WHEN status = "rejected" THEN 1 ELSE 0 END) as rejected'),
-            DB::raw('SUM(CASE WHEN status = "pending" THEN 1 ELSE 0 END) as pending'),
-            DB::raw('SUM(CASE WHEN status = "approved" THEN ticket_price ELSE 0 END) as revenue'),
+            DB::raw('COUNT(*) as total_transactions'),
+            DB::raw('SUM(quantity) as total_tickets'),
+            DB::raw('SUM(CASE WHEN status = "approved" THEN quantity ELSE 0 END) as approved'),
+            DB::raw('SUM(CASE WHEN status = "rejected" THEN quantity ELSE 0 END) as rejected'),
+            DB::raw('SUM(CASE WHEN status = "pending"  THEN quantity ELSE 0 END) as pending'),
+            DB::raw('SUM(CASE WHEN status = "approved" THEN total_price ELSE 0 END) as revenue'),
         )->whereBetween(DB::raw('DATE(created_at)'), [$from, $to])->first();
 
         $byLottery = TicketPurchase::select(
                 'lottery_id',
-                DB::raw('COUNT(*) as total'),
-                DB::raw('SUM(CASE WHEN status = "approved" THEN ticket_price ELSE 0 END) as revenue'),
-                DB::raw('SUM(CASE WHEN status = "approved" THEN 1 ELSE 0 END) as approved'),
-                DB::raw('SUM(CASE WHEN status = "rejected" THEN 1 ELSE 0 END) as rejected'),
+                DB::raw('COUNT(*) as total_transactions'),
+                DB::raw('SUM(quantity) as total_tickets'),
+                DB::raw('SUM(CASE WHEN status = "approved" THEN total_price ELSE 0 END) as revenue'),
+                DB::raw('SUM(CASE WHEN status = "approved" THEN quantity ELSE 0 END) as approved'),
+                DB::raw('SUM(CASE WHEN status = "rejected" THEN quantity ELSE 0 END) as rejected'),
             )
             ->with('lottery:id,name')
             ->whereBetween(DB::raw('DATE(created_at)'), [$from, $to])
@@ -36,7 +38,11 @@ class ReportController extends Controller
             ->get();
 
         $dailySales = TicketPurchase::approved()
-            ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as count'), DB::raw('SUM(ticket_price) as revenue'))
+            ->select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('SUM(quantity) as count'),
+                DB::raw('SUM(total_price) as revenue')
+            )
             ->whereBetween(DB::raw('DATE(created_at)'), [$from, $to])
             ->groupBy('date')
             ->orderBy('date')

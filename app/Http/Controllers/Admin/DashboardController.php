@@ -15,9 +15,9 @@ class DashboardController extends Controller
         // ── KPI stats ──────────────────────────────────────────────
         $stats = [
             'pending_count'    => TicketPurchase::pending()->count(),
-            'approved_count'   => TicketPurchase::approved()->count(),
+            'approved_count'   => (int) TicketPurchase::approved()->sum('quantity'),
             'rejected_count'   => TicketPurchase::rejected()->count(),
-            'total_sales'      => TicketPurchase::approved()->sum('ticket_price'),
+            'total_sales'      => (float) TicketPurchase::approved()->sum('total_price'),
             'active_lotteries' => Lottery::active()->count(),
             'total_users'      => User::whereDoesntHave('roles')->count(),
             'expenses_month'   => \App\Models\Expense::approved()->thisMonth()->sum('amount'),
@@ -37,7 +37,7 @@ class DashboardController extends Controller
 
         // ── Sales over last 30 days (line chart) ───────────────────
         $salesByDay = TicketPurchase::approved()
-            ->select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(ticket_price) as total'))
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(total_price) as total'))
             ->where('created_at', '>=', now()->subDays(29)->startOfDay())
             ->groupBy('date')
             ->orderBy('date')
@@ -54,29 +54,27 @@ class DashboardController extends Controller
         }
 
         // ── Lottery comparison chart data ──────────────────────────
-        // Each lottery: name, pending, approved, rejected, total, revenue
         $lotteryChart = Lottery::withCount([
                 'ticketPurchases as total_count',
                 'ticketPurchases as pending_count'  => fn ($q) => $q->where('status', 'pending'),
-                'ticketPurchases as approved_count' => fn ($q) => $q->where('status', 'approved'),
                 'ticketPurchases as rejected_count' => fn ($q) => $q->where('status', 'rejected'),
             ])
-            ->withSum(['ticketPurchases as total_revenue' => fn ($q) => $q->where('status', 'approved')],
-                      'ticket_price')
+            ->withSum(['ticketPurchases as approved_count' => fn ($q) => $q->where('status', 'approved')], 'quantity')
+            ->withSum(['ticketPurchases as total_revenue'  => fn ($q) => $q->where('status', 'approved')], 'total_price')
             ->orderByDesc('total_count')
             ->limit(6)
             ->get();
 
-        // Bar chart arrays
         $lotteryNames    = $lotteryChart->pluck('name')->map(fn($n) => strlen($n) > 20 ? substr($n,0,18).'…' : $n)->values()->toArray();
         $lotteryPending  = $lotteryChart->pluck('pending_count')->values()->toArray();
-        $lotteryApproved = $lotteryChart->pluck('approved_count')->values()->toArray();
+        $lotteryApproved = $lotteryChart->pluck('approved_count')->map(fn($v) => (int)($v ?? 0))->values()->toArray();
         $lotteryRejected = $lotteryChart->pluck('rejected_count')->values()->toArray();
-        $lotteryRevenue  = $lotteryChart->pluck('total_revenue')->map(fn($v) => (float)$v)->values()->toArray();
+        $lotteryRevenue  = $lotteryChart->pluck('total_revenue')->map(fn($v) => (float)($v ?? 0))->values()->toArray();
 
         // ── Tickets by lottery (sidebar bars) ─────────────────────
-        $ticketsByLottery = TicketPurchase::select('lottery_id', DB::raw('count(*) as total'))
+        $ticketsByLottery = TicketPurchase::select('lottery_id', DB::raw('SUM(quantity) as total'))
             ->with('lottery:id,name')
+            ->where('status', 'approved')
             ->groupBy('lottery_id')
             ->orderByDesc('total')
             ->limit(5)
