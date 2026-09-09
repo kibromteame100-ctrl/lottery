@@ -38,12 +38,10 @@ class LotteryController extends Controller
 
     public function show(Lottery $lottery)
     {
-        $lottery->loadCount([
-            'ticketPurchases',
-            'ticketPurchases as pending_count'  => fn($q) => $q->where('status', 'pending'),
-            'ticketPurchases as approved_count' => fn($q) => $q->where('status', 'approved'),
-            'ticketPurchases as rejected_count' => fn($q) => $q->where('status', 'rejected'),
-        ]);
+        $lottery->loadCount(['ticketPurchases'])
+            ->loadSum(['ticketPurchases as pending_count'  => fn($q) => $q->where('status', 'pending')],  'quantity')
+            ->loadSum(['ticketPurchases as approved_count' => fn($q) => $q->where('status', 'approved')], 'quantity')
+            ->loadSum(['ticketPurchases as rejected_count' => fn($q) => $q->where('status', 'rejected')], 'quantity');
 
         $recentTickets = $lottery->ticketPurchases()
             ->with('user')

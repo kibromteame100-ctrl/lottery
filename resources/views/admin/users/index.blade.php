@@ -15,7 +15,7 @@
             <select name="status"
                     class="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700
                            text-gray-900 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <option value="">All Statuses</option>
+                <option value="">{{ __('admin.all_statuses') }}</option>
                 @foreach(['active','inactive','suspended'] as $s)
                 <option value="{{ $s }}" @selected(request('status') === $s)>{{ ucfirst($s) }}</option>
                 @endforeach
@@ -26,7 +26,7 @@
             </button>
             @if(request()->hasAny(['search','status']))
             <a href="{{ route('admin.users.index') }}"
-               class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 px-3 py-2">Clear</a>
+               class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 px-3 py-2">{{ __('admin.clear') }}</a>
             @endif
         </div>
     </form>
@@ -38,9 +38,9 @@
                     <tr class="text-left text-gray-600 dark:text-gray-400">
                         <th class="px-4 py-3 font-medium">{{ __('admin.name') }}</th>
                         <th class="px-4 py-3 font-medium">{{ __('admin.phone') }} / {{ __('admin.email') }}</th>
-                        <th class="px-4 py-3 font-medium">Tickets</th>
+                        <th class="px-4 py-3 font-medium">{{ __('admin.tickets_count') }}</th>
                         <th class="px-4 py-3 font-medium">{{ __('admin.status') }}</th>
-                        <th class="px-4 py-3 font-medium">Joined</th>
+                        <th class="px-4 py-3 font-medium">{{ __('admin.joined') }}</th>
                         <th class="px-4 py-3 font-medium">{{ __('admin.actions') }}</th>
                     </tr>
                 </thead>
@@ -73,15 +73,15 @@
                                     @csrf @method('PATCH')
                                     <button type="submit"
                                             class="text-xs font-medium {{ $user->status === 'active' ? 'text-red-500 hover:text-red-700' : 'text-green-600 hover:text-green-800' }}">
-                                        {{ $user->status === 'active' ? 'Suspend' : 'Activate' }}
+                                        {{ $user->status === 'active' ? __('admin.suspend') : __('admin.activate') }}
                                     </button>
                                 </form>
                                 <form method="POST" action="{{ route('admin.users.destroy', $user) }}"
-                                      onsubmit="return confirm('Are you sure you want to permanently delete {{ addslashes($user->name) }}? This action cannot be undone.')">
+                                      onsubmit="return confirm('{{ __('admin.confirm_delete_user', ['name' => addslashes($user->name)]) }}')">>
                                     @csrf @method('DELETE')
                                     <button type="submit"
                                             class="text-xs font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
-                                        Delete
+                                        {{ __('admin.delete') }}
                                     </button>
                                 </form>
                                 @endrole

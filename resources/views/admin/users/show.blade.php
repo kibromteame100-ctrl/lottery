@@ -34,7 +34,7 @@
                                {{ $user->status === 'active'
                                   ? 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400'
                                   : 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400' }}">
-                    {{ $user->status === 'active' ? 'Suspend Account' : 'Activate Account' }}
+                    {{ $user->status === 'active' ? __('admin.suspend_account') : __('admin.activate_account') }}
                 </button>
             </form>
             @endrole
@@ -42,19 +42,19 @@
 
         <dl class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t dark:border-gray-700 text-sm">
             <div>
-                <dt class="text-gray-500 dark:text-gray-400">Joined</dt>
+                <dt class="text-gray-500 dark:text-gray-400">{{ __('admin.joined') }}</dt>
                 <dd class="font-medium text-gray-900 dark:text-gray-100 mt-0.5">
                     {{ $user->created_at->format('M d, Y') }}
                 </dd>
             </div>
             <div>
-                <dt class="text-gray-500 dark:text-gray-400">Language</dt>
+                <dt class="text-gray-500 dark:text-gray-400">{{ __('admin.language') }}</dt>
                 <dd class="font-medium text-gray-900 dark:text-gray-100 mt-0.5 uppercase">
                     {{ $user->preferred_locale }}
                 </dd>
             </div>
             <div>
-                <dt class="text-gray-500 dark:text-gray-400">Total Tickets</dt>
+                <dt class="text-gray-500 dark:text-gray-400">{{ __('admin.total_tickets_user') }}</dt>
                 <dd class="font-medium text-gray-900 dark:text-gray-100 mt-0.5">
                     {{ $tickets->total() }}
                 </dd>
@@ -65,16 +65,16 @@
     {{-- Ticket History --}}
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden">
         <div class="px-5 py-4 border-b dark:border-gray-700">
-            <h2 class="font-semibold text-gray-800 dark:text-gray-100">Ticket History</h2>
+            <h2 class="font-semibold text-gray-800 dark:text-gray-100">{{ __('admin.ticket_history') }}</h2>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-gray-50 dark:bg-gray-700/50">
                     <tr class="text-left text-gray-600 dark:text-gray-400">
                         <th class="px-4 py-3 font-medium">#</th>
-                        <th class="px-4 py-3 font-medium">Lottery</th>
-                        <th class="px-4 py-3 font-medium">Transaction</th>
-                        <th class="px-4 py-3 font-medium">Lottery Number</th>
+                        <th class="px-4 py-3 font-medium">{{ __('admin.lottery') }}</th>
+                        <th class="px-4 py-3 font-medium">{{ __('admin.transaction_id') }}</th>
+                        <th class="px-4 py-3 font-medium">{{ __('admin.lottery_number') }}</th>
                         <th class="px-4 py-3 font-medium">{{ __('admin.status') }}</th>
                         <th class="px-4 py-3 font-medium">{{ __('admin.date') }}</th>
                     </tr>
@@ -97,7 +97,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-4 py-8 text-center text-gray-400">No tickets found.</td>
+                        <td colspan="6" class="px-4 py-8 text-center text-gray-400">{{ __('admin.no_tickets') }}</td>
                     </tr>
                     @endforelse
                 </tbody>

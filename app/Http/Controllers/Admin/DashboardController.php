@@ -14,9 +14,9 @@ class DashboardController extends Controller
     {
         // ── KPI stats ──────────────────────────────────────────────
         $stats = [
-            'pending_count'    => TicketPurchase::pending()->count(),
+            'pending_count'    => (int) TicketPurchase::pending()->sum('quantity'),
             'approved_count'   => (int) TicketPurchase::approved()->sum('quantity'),
-            'rejected_count'   => TicketPurchase::rejected()->count(),
+            'rejected_count'   => (int) TicketPurchase::rejected()->sum('quantity'),
             'total_sales'      => (float) TicketPurchase::approved()->sum('total_price'),
             'active_lotteries' => Lottery::active()->count(),
             'total_users'      => User::whereDoesntHave('roles')->count(),
@@ -44,7 +44,6 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('date');
 
-        // Fill in missing days with 0
         $salesLabels = [];
         $salesData   = [];
         for ($i = 29; $i >= 0; $i--) {
@@ -71,6 +70,13 @@ class DashboardController extends Controller
         $lotteryRejected = $lotteryChart->pluck('rejected_count')->values()->toArray();
         $lotteryRevenue  = $lotteryChart->pluck('total_revenue')->map(fn($v) => (float)($v ?? 0))->values()->toArray();
 
+        // ── Quick ticket stats: today / week / month ──────────────
+        $mStats = [
+            ['label' => __('admin.today'),      'value' => (int) TicketPurchase::whereDate('created_at', today())->sum('quantity')],
+            ['label' => __('admin.this_week'),   'value' => (int) TicketPurchase::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->sum('quantity')],
+            ['label' => __('admin.this_month'),  'value' => (int) TicketPurchase::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('quantity')],
+        ];
+
         // ── Tickets by lottery (sidebar bars) ─────────────────────
         $ticketsByLottery = TicketPurchase::select('lottery_id', DB::raw('SUM(quantity) as total'))
             ->with('lottery:id,name')
@@ -93,6 +99,7 @@ class DashboardController extends Controller
             'lotteryRejected',
             'lotteryRevenue',
             'lotteryChart',
+            'mStats',
         ));
     }
 }

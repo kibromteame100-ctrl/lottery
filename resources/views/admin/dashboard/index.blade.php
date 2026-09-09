@@ -459,7 +459,10 @@ $kpis = [
                             {{ $ticket->lottery?->name ?? '—' }}
                         </td>
                         <td class="px-5 py-3 text-xs font-bold text-gray-800 dark:text-gray-100 whitespace-nowrap">
-                            {{ number_format($ticket->ticket_price, 2) }}
+                            ETB {{ number_format($ticket->total_price ?? $ticket->ticket_price, 2) }}
+                            @if(($ticket->quantity ?? 1) > 1)
+                            <span class="text-[10px] text-gray-400 block">×{{ $ticket->quantity }}</span>
+                            @endif
                         </td>
                         <td class="px-5 py-3">
                             @include('components.status-badge', ['status' => $ticket->status])
@@ -495,13 +498,6 @@ $kpis = [
         </div>
 
         {{-- Mini stats --}}
-        @php
-        $mStats = [
-            ['label'=>'Today','value'=>\App\Models\TicketPurchase::whereDate('created_at',today())->count()],
-            ['label'=>'Week', 'value'=>\App\Models\TicketPurchase::whereBetween('created_at',[now()->startOfWeek(),now()->endOfWeek()])->count()],
-            ['label'=>'Month','value'=>\App\Models\TicketPurchase::whereMonth('created_at',now()->month)->whereYear('created_at',now()->year)->count()],
-        ];
-        @endphp
         <div class="grid grid-cols-3 border-b border-gray-100 dark:border-white/[.05]">
             @foreach($mStats as $ms)
             <div class="px-2 py-3 text-center {{ !$loop->last ? 'border-r border-gray-100 dark:border-white/[.05]' : '' }}">

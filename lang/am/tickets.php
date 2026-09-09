@@ -9,3 +9,5 @@ return [
     'lottery_sold_out'        => 'ሎተሪዩ ሁሉ ተሸጧል።',
     'not_found'               => 'ትኬት አልተገኘም።',
 ];
+    'approve_confirm'              => 'ይህን ትኬት ያጽድቁ እና የሎተሪ ቁጥሮችን ይፍጠሩ?',
+    'rejection_reason_placeholder' => 'የውድቅ ምክንያት ያስገቡ (ያስፈልጋል)...',

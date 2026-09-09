@@ -9,3 +9,5 @@ return [
     'lottery_sold_out'        => 'ሎተሪ ወዲኡ ኣሎ።',
     'not_found'               => 'ቲኬት ኣይተረኽበን።',
 ];
+    'approve_confirm'              => 'ነዚ ቲኬት ኣጽድቕ፣ ናይ ሎተሪ ቁጽርታት ፍጠር?',
+    'rejection_reason_placeholder' => 'ምኽንያት ምንጻግ ኣእቱ (ናይ ግድን)...',

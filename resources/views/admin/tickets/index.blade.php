@@ -21,7 +21,7 @@
                     class="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700
                            text-gray-900 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2
                            focus:ring-indigo-500">
-                <option value="">All Statuses</option>
+                <option value="">{{ __('admin.all_statuses') }}</option>
                 @foreach(['pending','approved','rejected','cancelled'] as $s)
                 <option value="{{ $s }}" @selected(request('status') === $s)>{{ ucfirst($s) }}</option>
                 @endforeach
@@ -31,7 +31,7 @@
                     class="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700
                            text-gray-900 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2
                            focus:ring-indigo-500">
-                <option value="">All Lotteries</option>
+                <option value="">{{ __('admin.all_lotteries') }}</option>
                 @foreach($lotteries as $lottery)
                 <option value="{{ $lottery->id }}" @selected(request('lottery_id') == $lottery->id)>
                     {{ $lottery->name }}
@@ -46,7 +46,7 @@
             @if(request()->hasAny(['search','status','lottery_id']))
             <a href="{{ route('admin.tickets.index') }}"
                class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 px-3 py-2">
-                Clear
+                {{ __('admin.clear') }}
             </a>
             @endif
         </div>
@@ -60,11 +60,11 @@
                     <tr class="text-left text-gray-600 dark:text-gray-400">
                         <th class="px-4 py-3 font-medium">{{ __('admin.id') }}</th>
                         <th class="px-4 py-3 font-medium">{{ __('admin.name') }}</th>
-                        <th class="px-4 py-3 font-medium">Lottery</th>
-                        <th class="px-4 py-3 font-medium">Transaction ID</th>
-                        <th class="px-4 py-3 font-medium">Qty</th>
-                        <th class="px-4 py-3 font-medium">Unit Price</th>
-                        <th class="px-4 py-3 font-medium">Total</th>
+                        <th class="px-4 py-3 font-medium">{{ __('admin.lottery') }}</th>
+                        <th class="px-4 py-3 font-medium">{{ __('admin.transaction_id') }}</th>
+                        <th class="px-4 py-3 font-medium">{{ __('admin.quantity') }}</th>
+                        <th class="px-4 py-3 font-medium">{{ __('admin.unit_price') }}</th>
+                        <th class="px-4 py-3 font-medium">{{ __('admin.total') }}</th>
                         <th class="px-4 py-3 font-medium">{{ __('admin.status') }}</th>
                         <th class="px-4 py-3 font-medium">{{ __('admin.date') }}</th>
                         <th class="px-4 py-3 font-medium">{{ __('admin.actions') }}</th>
