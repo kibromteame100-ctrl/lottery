@@ -13,9 +13,10 @@ class LotteryController extends Controller
     public function index()
     {
         $lotteries = Lottery::withCount([
-            'ticketPurchases',
             'ticketPurchases as approved_count' => fn($q) => $q->where('status', 'approved'),
-        ])->latest()->paginate(15);
+        ])
+        ->withSum(['ticketPurchases as tickets_sold' => fn($q) => $q->where('status', 'approved')], 'quantity')
+        ->latest()->paginate(15);
 
         return view('admin.lotteries.index', compact('lotteries'));
     }

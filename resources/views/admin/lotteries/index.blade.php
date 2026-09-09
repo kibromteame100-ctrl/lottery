@@ -42,7 +42,7 @@
                             <div class="text-xs text-gray-400">{{ $lottery->draw_date->diffForHumans() }}</div>
                         </td>
                         <td class="px-4 py-3 text-gray-700 dark:text-gray-200">
-                            {{ number_format($lottery->ticket_purchases_count) }}
+                            {{ number_format($lottery->tickets_sold ?? 0) }}
                             @if($lottery->max_tickets)
                             <span class="text-xs text-gray-400">/ {{ $lottery->max_tickets }}</span>
                             @endif
